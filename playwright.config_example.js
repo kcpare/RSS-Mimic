@@ -28,47 +28,24 @@ module.exports = defineConfig({
     // baseURL: 'http://127.0.0.1:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    headless : false,
-    screenshot : 'on',
     trace: 'on-first-retry',
   },
 
   /* Configure projects for major browsers */
   projects: [
-    // Setup project
-    { name : 'setup', testMatch: /.*\.setup\.spec.js/},
-
     {
       name: 'chromium',
-      testIgnore: /.*\.setup\.spec.js/,
-      use: 
-      { 
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'] },
     },
 
     {
       name: 'firefox',
-      testIgnore: /.*\.setup\.spec.js/,
-      use: 
-      { 
-        ...devices['Desktop Firefox'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
+      use: { ...devices['Desktop Firefox'] },
     },
 
     {
       name: 'webkit',
-      testIgnore: /.*\.setup\.spec.js/,
-      use: 
-      { 
-        ...devices['Desktop Safari'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
+      use: { ...devices['Desktop Safari'] },
     },
 
     /* Test against mobile viewports. */
