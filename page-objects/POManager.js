@@ -1,5 +1,6 @@
 const { BlueskyLoginPage } = require('./BlueskyLoginPage');
 const { BlueskyAppPage } = require('./BlueskyAppPage');
+const { BlueskyProfilePage } = require('./BlueskyProfilePage');
 
 class POManager
 {
@@ -8,16 +9,23 @@ class POManager
         this.page = page;
     }
 
+    // Returns a new login page
     getBlueskyLoginPage()
     {
-        this.blueskyLoginPage = new BlueskyLoginPage(this.page);
-        return this.blueskyLoginPage;
+        return new BlueskyLoginPage(this.page);
     }
 
+    // Returns a new (home) app page
     getBlueskyAppPage()
     {
-        this.blueskyAppPage = new BlueskyAppPage(this.page);
-        return this.blueskyAppPage;
+        return new BlueskyAppPage(this.page);
+    }
+
+    // Given the handle of a user
+    // Returns a new profile page
+    getBlueskyProfilePage(userHandle)
+    {
+        return new BlueskyProfilePage(this.page, userHandle);
     }
 }
 

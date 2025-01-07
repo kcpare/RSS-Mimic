@@ -1,17 +1,16 @@
-import { test as setup, expect } from '@playwright/test';
+const { testSetup, expect } = require('../utils/test-setup');
 const { POManager } = require('../page-objects/POManager');
 
-// Load environemnt variables from .env file
-require('dotenv').config();
+// Declare path to save authentication state
 import path from 'path';
-const authFile = path.join(__dirname, '../playwright/.auth/user.json'); // Path to save authentication state
+const authFile = path.join(__dirname, '../playwright/.auth/user.json'); 
 
-setup('Login and store authenticated state', async ({ page }) => {
-    
+testSetup('Login and store authenticated state', async ({ page, setupInfo }) => {
+
     // Confirm authentication details are present as environment varaibles
-    if (!process.env.BLUESKY_USERNAME || !process.env.BLUESKY_PASSWORD)
+    if (!setupInfo.username || !setupInfo.password)
     {
-        throw new Error('Missing required environment variables for login');
+        throw new Error('Missing required environment variables for setup');
     }
     
     // Create required pages
@@ -21,7 +20,7 @@ setup('Login and store authenticated state', async ({ page }) => {
     
     // Sign in
     await blueskyLoginPage.goTo();
-    await blueskyLoginPage.signIn(process.env.BLUESKY_USERNAME, process.env.BLUESKY_PASSWORD);
+    await blueskyLoginPage.signIn(setupInfo.username, setupInfo.password);
 
     // Confirm page has loaded
     await expect(blueskyAppPage.homeButton).toBeVisible();

@@ -5,26 +5,32 @@ class BlueskyAppPage
         this.page = page;
     }
 
+    // Getter method for home button
     get homeButton()
     {
         return this.page.locator("a[aria-label='Home']");
     }
 
+    // Getter method for search button
     get searchButton()
     {
         return this.page.locator("a[aria-label='Search']");
     }
 
+    // Go to default page
     async goTo()
     {
         await this.page.goto("https://bsky.app/");
     }
 
-    async goToSearch(searchString)
+    // Given a user handle
+    // Search for that user and go to their page
+    async searchAndGoTo(userHandle)
     {
         await this.goTo();
         await this.searchButton.click();
-        await this.page.locator("input[aria-label='Search']").fill(searchString);
+        await this.page.locator("input[aria-label='Search']").fill(userHandle);
+        await this.page.locator("a[href='/profile/" + userHandle + "']").filter({ hasText : "@" + userHandle}).click();
     }
 }
 

@@ -16,13 +16,14 @@ module.exports = defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  /* Retry on CI only: process.env.CI ? 2 : 0 */
+  retries: 3,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
@@ -30,14 +31,14 @@ module.exports = defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     headless : false,
     screenshot : 'on',
-    trace: 'on-first-retry',
+    trace: 'on',
   },
 
   /* Configure projects for major browsers */
   projects: [
     // Setup project
     { name : 'setup', testMatch: /.*\.setup\.spec.js/},
-
+    
     {
       name: 'chromium',
       testIgnore: /.*\.setup\.spec.js/,
@@ -59,7 +60,7 @@ module.exports = defineConfig({
       },
       dependencies: ['setup'],
     },
-
+    
     {
       name: 'webkit',
       testIgnore: /.*\.setup\.spec.js/,
@@ -69,8 +70,9 @@ module.exports = defineConfig({
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
+      
     },
-
+    
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
