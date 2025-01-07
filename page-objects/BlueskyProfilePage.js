@@ -37,53 +37,84 @@ class BlueskyProfilePage
         
     }
 
-    // Returns the latest post of this user
+    // Returns the latest post of this user as a string
     async getLatestPost()
     {
         const latestPost = await this.posts.nth(1);
 
-        // Grab the time of the post
-        let timePosted = await latestPost.locator("a[aria-label*='AM']").first();
-        await latestPost.waitFor(timePosted);
-        if (await timePosted.count() === 0)
-        {
-            timePosted = await latestPost.locator("a[aria-label*='PM']").first();
-        }
-        console.log("time posted = " + await timePosted.getAttribute("aria-label"));
+        console.log("Latest post for : " + this.userHandle + "\n");
 
+        // Grab the time of the post
+        const timePosted = await this.getPostTimestamp(latestPost);
+        console.log("Time posted : " + timePosted + "\n");
+        
         // Grab any text in the post, if possible
-        const postText = await latestPost.locator("div[data-testid='postText']");
-        await latestPost.waitFor(postText);
-        if (await postText.count() === 0)
+        const postText = await this.getPostText(latestPost);
+        if (!postText)
         {
-            console.log("This post has no post text");
+            console.log("Post Text : This post has no post text\n");
         }
-        else
+        else 
         {
-            console.log("post text = " + await postText.textContent());
+            console.log("Post Text : " + postText + "\n");
         }
 
         // If the post has images, grab its alt text, if possible
-        const image = await latestPost.locator("div[data-expoimage='true']").locator("img");
-        if (await image.count() === 0)
+        const altText = await this.getPostImageAltText(latestPost);
+        if (!altText)
         {
-            console.log("This post has no image");
+            console.log("Alt Text : This post has no image alt text\n");
         }
         else
         {
-            for(let i = 0; i < await image.count(); i++)
+            console.log("Alt Text : \n" + altText + "\n");
+        }
+
+        console.log("\n");
+    }
+
+    async getPostTimestamp(post)
+    {
+        let timePosted = await post.locator("a[aria-label*='AM']").first();
+        await post.waitFor(timePosted);
+        if (await timePosted.count() === 0)
+        {
+            timePosted = await post.locator("a[aria-label*='PM']").first();
+        }
+        return await timePosted.getAttribute("aria-label");
+    }
+ 
+    async getPostText(post)
+    {
+        const postText = await post.locator("div[data-testid='postText']");
+        await post.waitFor(postText);
+        if (await postText.count() === 0)
+        {
+            return '';
+        }
+        else
+        {
+            return await postText.textContent();
+        }
+    }
+
+    async getPostImageAltText(post)
+    {
+        const images = await post.locator("div[data-expoimage='true']").locator("img");
+        let altText = '';
+        if (await images.count() != 0)
+        {
+            for(let i = 0; i < await images.count(); i++)
             {
-                if (await image.nth(i).getAttribute('alt') === "")
+                if (await images.nth(i).getAttribute('alt') != "")
                 {
-                    console.log("This image has no alt text");
-                }
-                else
-                {
-                    console.log("alt = " + await image.nth(i).getAttribute('alt'));
+                    altText = altText.concat("Image " + (i+1) + " : " + await images.nth(i).getAttribute('alt') + "\n");
                 }
             }
         }
+        return altText;
     }
+
 }
 
 module.exports = {BlueskyProfilePage};
