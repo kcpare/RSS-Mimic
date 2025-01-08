@@ -30,7 +30,7 @@ class BlueskyAppPage
         await this.goTo();
         await this.searchButton.click();
         await this.page.locator("input[aria-label='Search']").fill(userHandle);
-        await this.page.locator("a[href='/profile/" + userHandle + "']").filter({ hasText : "@" + userHandle}).click();
+        await this.page.locator("a[href='/profile/" + userHandle + "']").first().click();
     }
 }
 
