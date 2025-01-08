@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "setup" : "npx playwright test --project=setup",
+    "firefox" : "npx playwright test --project=firefox",
+    "firefox-no-deps" : "npx playwright test --project=firefox --no-deps",
+    "chrome" : "npx playwright test --project=chromium",
+    "chrome-no-deps" : "npx playwright test --project=chrome --no-deps",
+    "safari" : "npx playwright test --project=webkit",
+    "safari-no-deps" : "npx playwright test --project=webkit --no-deps"
+    
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
