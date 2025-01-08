@@ -6,7 +6,7 @@ class BlueskyProfilePage
         this.userHandle = userHandle;
     }
 
-    // Getter method for the array of posts currently visible on the profile page
+    // Getter method for the posts currently visible on the profile page
     get posts()
     {
         const flatlist = this.page.locator("div[data-testid='postsFeed-flatlist']").first();
@@ -14,7 +14,7 @@ class BlueskyProfilePage
         return postFeed;
     }
 
-    // Returns the list of accounts this user follows
+    // Return the list of accounts this user follows
     async getFollowList()
     {
         // Move to follow list
@@ -37,19 +37,18 @@ class BlueskyProfilePage
         
     }
 
-    // Returns the latest post of this user as a string
-    async getLatestPost()
+    // Given a post
+    // Return the content of the post
+    async getLatestPost(post)
     {
-        const latestPost = await this.posts.nth(1);
-
         console.log("Latest post for : " + this.userHandle + "\n");
 
         // Grab the time of the post
-        const timePosted = await this.getPostTimestamp(latestPost);
+        const timePosted = await this.getPostTimestamp(post);
         console.log("Time posted : " + timePosted + "\n");
         
         // Grab any text in the post, if possible
-        const postText = await this.getPostText(latestPost);
+        const postText = await this.getPostText(post);
         if (!postText)
         {
             console.log("Post Text : This post has no post text\n");
@@ -60,7 +59,7 @@ class BlueskyProfilePage
         }
 
         // If the post has images, grab its alt text, if possible
-        const altText = await this.getPostImageAltText(latestPost);
+        const altText = await this.getPostImageAltText(post);
         if (!altText)
         {
             console.log("Alt Text : This post has no image alt text\n");
@@ -73,10 +72,40 @@ class BlueskyProfilePage
         console.log("\n");
     }
 
+    // Grab the pinned post
+    async getPinnedPost()
+    {
+        await this.getLatestPost(this.posts.nth(0));
+    }
+
+    // Grab the posts from the last seven days for this user
+    async getPastWeekPosts()
+    {
+        const today = new Date(Date.now());
+        const weekMS = 7 * 24 * 60 * 60 * 1000; // The number of milliseconds in a week
+        const sevenDaysAgo = new Date(today.getTime() - weekMS);
+
+        await this.posts.last().waitFor();
+        const numPosts = await this.posts.count();
+        for (let i = 1; i < numPosts; i++)
+        {
+            const currPost = await this.posts.nth(i);
+            const postDate = await this.#getDate(await this.getPostTimestamp(currPost));
+            if (postDate.getTime() < sevenDaysAgo.getTime()) // if postDate is older than seven days
+            {
+                break;
+            }
+            
+            await this.getLatestPost(currPost);
+        }
+    }
+
+    // Given a post
+    // Return the timestamp for the post
     async getPostTimestamp(post)
     {
+        await post.waitFor();
         let timePosted = await post.locator("a[aria-label*='AM']").first();
-        await post.waitFor(timePosted);
         if (await timePosted.count() === 0)
         {
             timePosted = await post.locator("a[aria-label*='PM']").first();
@@ -84,6 +113,8 @@ class BlueskyProfilePage
         return await timePosted.getAttribute("aria-label");
     }
  
+    // Given a post
+    // Return any text found in the post
     async getPostText(post)
     {
         const postText = await post.locator("div[data-testid='postText']");
@@ -98,6 +129,8 @@ class BlueskyProfilePage
         }
     }
 
+    // Given a post
+    // Return the alt text for any images found in the post
     async getPostImageAltText(post)
     {
         const images = await post.locator("div[data-expoimage='true']").locator("img");
@@ -115,6 +148,15 @@ class BlueskyProfilePage
         return altText;
     }
 
+    // ----- ----- ----- ----- ----- Private Helper Methods ----- ----- ----- ----- ----- //
+    // Given a datestring in format: January 2, 2025 at 4:05 PM
+    // Return the Javascript Date object for 'January 2, 2025' 
+    async #getDate(timestamp)
+    {
+        const datestring = timestamp.split(" at ")[0]; // remove any text including and after " at ", leaving just: month date, year
+        const parsedDate = Date.parse(datestring);
+        return new Date(parsedDate);
+    }
 }
 
 module.exports = {BlueskyProfilePage};

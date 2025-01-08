@@ -18,6 +18,7 @@ test.only('Search latest posts from followed accounts', async ({ page, testData 
     {
         await blueskyAppPage.searchAndGoTo(followList[i]);
         blueskyProfilePage = poManager.getBlueskyProfilePage(followList[i]);
-        await blueskyProfilePage.getLatestPost();
-    }    
+        await blueskyProfilePage.getPinnedPost();
+        await blueskyProfilePage.getPastWeekPosts();
+    }
 });
