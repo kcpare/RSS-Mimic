@@ -38,7 +38,7 @@ module.exports = defineConfig({
   projects: [
     { name : 'setup', testMatch: /.*\.setup\.spec.js/, teardown: 'teardown' },
     
-    { name: 'teardown', testMatch: /.*\.teardown.spec.js/ },
+    { name: 'teardown', testMatch: /.*\.teardown\.spec.js/ },
 
     {
       name: 'chromium',
