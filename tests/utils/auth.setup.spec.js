@@ -1,9 +1,6 @@
 const { testSetup, expect } = require('../../utils/test-setup');
+const { authSettings } = require('../../test-data/AuthSettings');
 const { POManager } = require('../../page-objects/POManager');
-
-// Declare path to save authentication state
-import path from 'path';
-const authFile = path.join(__dirname, '../../playwright/.auth/user.json'); 
 
 testSetup('Login and store authenticated state', async ({ page, setupInfo }) => {
 
@@ -26,5 +23,5 @@ testSetup('Login and store authenticated state', async ({ page, setupInfo }) => 
     await expect(blueskyAppPage.homeButton).toBeVisible();
 
     //Save storage state
-    await page.context().storageState({ path: authFile });
+    await page.context().storageState({ path: authSettings.authFilepath });
 });
