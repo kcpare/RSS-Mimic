@@ -36,12 +36,13 @@ module.exports = defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // Setup project
-    { name : 'setup', testMatch: /.*\.setup\.spec.js/},
+    { name : 'setup', testMatch: /.*\.setup\.spec.js/, teardown: 'teardown' },
     
+    { name: 'teardown', testMatch: /.*\.teardown.spec.js/ },
+
     {
       name: 'chromium',
-      testIgnore: /.*\.setup\.spec.js/,
+      testIgnore: /.*utils.*/,
       use: 
       { 
         ...devices['Desktop Chrome'],
@@ -52,7 +53,7 @@ module.exports = defineConfig({
 
     {
       name: 'firefox',
-      testIgnore: /.*\.setup\.spec.js/,
+      testIgnore: /.*utils.*/,
       use: 
       { 
         ...devices['Desktop Firefox'],
@@ -63,7 +64,7 @@ module.exports = defineConfig({
     
     {
       name: 'webkit',
-      testIgnore: /.*\.setup\.spec.js/,
+      testIgnore: /.*utils.*/,
       use: 
       { 
         ...devices['Desktop Safari'],

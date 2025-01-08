@@ -1,9 +1,9 @@
-const { testSetup, expect } = require('../utils/test-setup');
-const { POManager } = require('../page-objects/POManager');
+const { testSetup, expect } = require('../../utils/test-setup');
+const { POManager } = require('../../page-objects/POManager');
 
 // Declare path to save authentication state
 import path from 'path';
-const authFile = path.join(__dirname, '../playwright/.auth/user.json'); 
+const authFile = path.join(__dirname, '../../playwright/.auth/user.json'); 
 
 testSetup('Login and store authenticated state', async ({ page, setupInfo }) => {
 
@@ -27,5 +27,4 @@ testSetup('Login and store authenticated state', async ({ page, setupInfo }) => 
 
     //Save storage state
     await page.context().storageState({ path: authFile });
-    
 });
