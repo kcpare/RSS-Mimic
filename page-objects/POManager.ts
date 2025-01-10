@@ -1,10 +1,13 @@
-const { BlueskyLoginPage } = require('./BlueskyLoginPage');
-const { BlueskyAppPage } = require('./BlueskyAppPage');
-const { BlueskyProfilePage } = require('./BlueskyProfilePage');
+import { type Page } from '@playwright/test';
+import { BlueskyLoginPage } from './BlueskyLoginPage';
+import { BlueskyAppPage } from './BlueskyAppPage';
+import { BlueskyProfilePage } from './BlueskyProfilePage';
 
-class POManager
+export class POManager
 {
-    constructor(page)
+    page : Page;
+
+    constructor(page : Page)
     {
         this.page = page;
     }
@@ -23,7 +26,7 @@ class POManager
 
     // Given the handle of a user
     // Returns a new profile page
-    getBlueskyProfilePage(userHandle)
+    getBlueskyProfilePage(userHandle : string)
     {
         return new BlueskyProfilePage(this.page, userHandle);
     }

@@ -1,8 +1,11 @@
-const path = require('path');
+import { type Page, type Locator } from '@playwright/test';
 
-class BlueskyLoginPage
+export class BlueskyLoginPage
 {
-    constructor(page)
+    page : Page;
+    loginPage : string;
+
+    constructor(page : Page)
     {
         this.page = page;
         this.loginPage = "https://bsky.app/settings";
@@ -39,7 +42,7 @@ class BlueskyLoginPage
     }
 
     // Given a user's username (or email) and password, sign in
-    async signIn(user_usernameOrEmail, user_password)
+    async signIn(user_usernameOrEmail : string, user_password : string)
     {
         await this.signInButton.click()
         await this.usernameOrEmail.click()

@@ -1,6 +1,6 @@
-const { testSetup, expect } = require('../../utils/test-setup');
-const { authSettings } = require('../../test-data/AuthSettings');
-const { POManager } = require('../../page-objects/POManager');
+import { testSetup, expect } from '../../utils/test-setup';
+import { authSettings } from '../../test-data/AuthSettings';
+import { POManager } from '../../page-objects/POManager';
 
 testSetup('Login and store authenticated state', async ({ page, setupInfo }) => {
 

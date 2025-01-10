@@ -1,6 +1,10 @@
-class BlueskyAppPage
+import { type Page, type Locator } from '@playwright/test';
+
+export class BlueskyAppPage
 {
-    constructor(page)
+    page : Page;
+
+    constructor(page : Page)
     {
         this.page = page;
     }
@@ -25,7 +29,7 @@ class BlueskyAppPage
 
     // Given a user handle
     // Search for that user and go to their page
-    async searchAndGoTo(userHandle)
+    async searchAndGoTo(userHandle : string)
     {
         await this.goTo();
         await this.searchButton.click();

@@ -1,7 +1,7 @@
 import path from 'path';
 
 // Declare path to save authentication state
-const authFile = path.join(__dirname, '../playwright/.auth/user.json'); 
+const authFile : string = path.join(__dirname, '../playwright/.auth/user.json'); 
 
 // Export authentication settings
 // (except those that must be secure, which get saved in .env as environment variables instead)

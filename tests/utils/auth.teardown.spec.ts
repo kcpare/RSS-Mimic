@@ -1,6 +1,6 @@
 import { test as teardown } from '@playwright/test';
-const { authSettings } = require('../../test-data/AuthSettings');
-let fs = require('fs'); 
+import { authSettings } from '../../test-data/AuthSettings';
+import fs from 'fs'; 
 
 teardown('Delete stored authenticated state', async ({ }) => 
 {

@@ -1,6 +1,11 @@
-class BlueskyProfilePage
+import { type Page, type Locator } from '@playwright/test';
+
+export class BlueskyProfilePage
 {
-    constructor(page, userHandle)
+    page : Page;
+    userHandle : string;
+
+    constructor(page : Page, userHandle : string)
     {
         this.page = page;
         this.userHandle = userHandle;
@@ -27,8 +32,14 @@ class BlueskyProfilePage
         for(let i = 0; i < await theList.count(); i++)
         {
             const link = await theList.nth(i).getAttribute('href');
-            console.log(link);
-            following[i] = await link.split("/profile/")[1];
+            if (!link)
+            {
+                throw new Error("Missing profile link.");
+            }
+            else
+            {
+                following[i] = await link.split("/profile/")[1];
+            }
         }
 
         return following;
@@ -36,7 +47,7 @@ class BlueskyProfilePage
     }
 
     // Given a Javascript Date object, returns an array of posts created since that date
-    async getPosts(date)
+    async getPosts(date : Date)
     {
         await this.#posts.last().waitFor();
         const numPosts = await this.#posts.count();
@@ -44,6 +55,8 @@ class BlueskyProfilePage
         {
             const currPost = await this.#posts.nth(i);
             const postDate = await this.getPostTimestamp(currPost);
+
+            if (!postDate) { throw new Error("Date posted is null.") };
             if (postDate.getTime() < date.getTime()) // if postDate is older than our given date
             {
                 break;
@@ -55,12 +68,13 @@ class BlueskyProfilePage
 
     // Given a post
     // Return the content of the post
-    async getPost(post)
+    async getPost(post : Locator)
     {
         console.log("Post for : " + this.userHandle + "\n");
 
         // Grab the time of the post
         const timePosted = await this.getPostTimestamp(post);
+        if (!timePosted) { throw new Error("Time posted is null.") };
         console.log("Time posted : " + timePosted.toDateString() + "\n");
         
         // Grab any text in the post, if possible
@@ -105,7 +119,7 @@ class BlueskyProfilePage
 
     // Given a post,
     // Returns a Javascript Date object for the time it was posted
-    async getPostTimestamp(post)
+    async getPostTimestamp(post : Locator)
     {
         await post.waitFor();
         let timePosted = await post.locator("a[aria-label*='AM']").first();
@@ -113,15 +127,17 @@ class BlueskyProfilePage
         {
             timePosted = await post.locator("a[aria-label*='PM']").first();
         }
-        return await this.#getDate(await timePosted.getAttribute("aria-label"));
+        
+        const timestamp : string = (await timePosted.getAttribute("aria-label")) || '';
+        return await this.#getDate(timestamp);
     }
  
     // Given a post
     // Returns a string of its post text
-    async getPostText(post)
+    async getPostText(post : Locator)
     {
+        await post.waitFor();
         const postText = await post.locator("div[data-testid='postText']");
-        await post.waitFor(postText);
         if (await postText.count() === 0)
         {
             return '';
@@ -134,7 +150,7 @@ class BlueskyProfilePage
 
     // Given a post
     // Returns a string of the alt text for any images in the post
-    async getPostImageAltText(post)
+    async getPostImageAltText(post : Locator)
     {
         const images = await post.locator("div[data-expoimage='true']").locator("img");
         let altText = '';
@@ -162,8 +178,9 @@ class BlueskyProfilePage
     
     // Given a datestring in format: January 2, 2025 at 4:05 PM
     // Return the Javascript Date object for 'January 2, 2025' 
-    async #getDate(timestamp)
+    async #getDate(timestamp : string)
     {
+        if (timestamp === '') { return null; }
         const datestring = timestamp.split(" at ")[0]; // remove any text including and after " at ", leaving just: month date, year
         const parsedDate = Date.parse(datestring);
         return new Date(parsedDate);

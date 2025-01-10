@@ -1,8 +1,14 @@
-const { test, expect } = require('../utils/test-extended');
-const { POManager } = require('../page-objects/POManager');
+import { testExtended, expect } from '../utils/test-extended';
+import { POManager } from '../page-objects/POManager';
 
-test.only('Search latest posts from followed accounts', async ({ page, testData }) => 
+testExtended.only('Search latest posts from followed accounts', async ({ page, testData }) => 
 {
+    // Confirm authentication details are present as environment varaibles
+    if (!testData.userHandle)
+    {
+        throw new Error('Missing required environment variable userHandle');
+    }
+    
     // Grab first page
     const poManager = new POManager(page);
     const blueskyAppPage = poManager.getBlueskyAppPage();
