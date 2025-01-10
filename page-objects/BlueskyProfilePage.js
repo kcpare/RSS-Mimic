@@ -6,12 +6,10 @@ class BlueskyProfilePage
         this.userHandle = userHandle;
     }
 
-    // Getter method for the posts currently visible on the profile page
-    get posts()
+    // Returns the user handle for this profile page
+    getUserHandle()
     {
-        const flatlist = this.page.locator("div[data-testid='postsFeed-flatlist']").first();
-        const postFeed = flatlist.locator("div[data-testid*='feedItem-by']");
-        return postFeed;
+        return this.userHandle;
     }
 
     // Return the list of accounts this user follows
@@ -37,15 +35,33 @@ class BlueskyProfilePage
         
     }
 
+    // Given a Javascript Date object, returns an array of posts created since that date
+    async getPosts(date)
+    {
+        await this.#posts.last().waitFor();
+        const numPosts = await this.#posts.count();
+        for (let i = 1; i < numPosts; i++)
+        {
+            const currPost = await this.#posts.nth(i);
+            const postDate = await this.getPostTimestamp(currPost);
+            if (postDate.getTime() < date.getTime()) // if postDate is older than our given date
+            {
+                break;
+            }
+            
+            await this.getPost(currPost);
+        }
+    }
+
     // Given a post
     // Return the content of the post
-    async getLatestPost(post)
+    async getPost(post)
     {
-        console.log("Latest post for : " + this.userHandle + "\n");
+        console.log("Post for : " + this.userHandle + "\n");
 
         // Grab the time of the post
         const timePosted = await this.getPostTimestamp(post);
-        console.log("Time posted : " + timePosted + "\n");
+        console.log("Time posted : " + timePosted.toDateString() + "\n");
         
         // Grab any text in the post, if possible
         const postText = await this.getPostText(post);
@@ -75,7 +91,7 @@ class BlueskyProfilePage
     // Grab the pinned post
     async getPinnedPost()
     {
-        await this.getLatestPost(this.posts.nth(0));
+        await this.getPost(this.#posts.nth(0));
     }
 
     // Grab the posts from the last seven days for this user
@@ -84,24 +100,11 @@ class BlueskyProfilePage
         const today = new Date(Date.now());
         const weekMS = 7 * 24 * 60 * 60 * 1000; // The number of milliseconds in a week
         const sevenDaysAgo = new Date(today.getTime() - weekMS);
-
-        await this.posts.last().waitFor();
-        const numPosts = await this.posts.count();
-        for (let i = 1; i < numPosts; i++)
-        {
-            const currPost = await this.posts.nth(i);
-            const postDate = await this.#getDate(await this.getPostTimestamp(currPost));
-            if (postDate.getTime() < sevenDaysAgo.getTime()) // if postDate is older than seven days
-            {
-                break;
-            }
-            
-            await this.getLatestPost(currPost);
-        }
+        await this.getPosts(sevenDaysAgo);
     }
 
-    // Given a post
-    // Return the timestamp for the post
+    // Given a post,
+    // Returns a Javascript Date object for the time it was posted
     async getPostTimestamp(post)
     {
         await post.waitFor();
@@ -110,11 +113,11 @@ class BlueskyProfilePage
         {
             timePosted = await post.locator("a[aria-label*='PM']").first();
         }
-        return await timePosted.getAttribute("aria-label");
+        return await this.#getDate(await timePosted.getAttribute("aria-label"));
     }
  
     // Given a post
-    // Return any text found in the post
+    // Returns a string of its post text
     async getPostText(post)
     {
         const postText = await post.locator("div[data-testid='postText']");
@@ -130,7 +133,7 @@ class BlueskyProfilePage
     }
 
     // Given a post
-    // Return the alt text for any images found in the post
+    // Returns a string of the alt text for any images in the post
     async getPostImageAltText(post)
     {
         const images = await post.locator("div[data-expoimage='true']").locator("img");
@@ -149,6 +152,14 @@ class BlueskyProfilePage
     }
 
     // ----- ----- ----- ----- ----- Private Helper Methods ----- ----- ----- ----- ----- //
+    // Getter method for the posts currently visible on the profile page
+    get #posts()
+    {
+        const flatlist = this.page.locator("div[data-testid='postsFeed-flatlist']").first();
+        const postFeed = flatlist.locator("div[data-testid*='feedItem-by']");
+        return postFeed;
+    }
+    
     // Given a datestring in format: January 2, 2025 at 4:05 PM
     // Return the Javascript Date object for 'January 2, 2025' 
     async #getDate(timestamp)
