@@ -1,12 +1,15 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { HomePageInterface } from '../../../page-objects/HomePage';
 
-export class BlueskyAppPage
+export class HomePage implements HomePageInterface
 {
     page : Page;
+    homePage : string;
 
     constructor(page : Page)
     {
         this.page = page;
+        this.homePage = "https://bsky.app/";
     }
 
     // Getter method for home button
@@ -24,7 +27,7 @@ export class BlueskyAppPage
     // Go to default page
     async goTo()
     {
-        await this.page.goto("https://bsky.app/");
+        await this.page.goto(this.homePage, { waitUntil: 'domcontentloaded' } );
     }
 
     // Given a user handle
@@ -34,8 +37,6 @@ export class BlueskyAppPage
         await this.goTo();
         await this.searchButton.click();
         await this.page.locator("input[aria-label='Search']").fill(userHandle);
-        await this.page.locator("a[href='/profile/" + userHandle + "']").first().click();
+        await this.page.locator("a[data-testid='searchAutoCompleteResult-" + userHandle + "']").click();
     }
 }
-
-module.exports = {BlueskyAppPage};

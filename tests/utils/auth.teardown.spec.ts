@@ -5,12 +5,8 @@ import fs from 'fs';
 teardown('Delete stored authenticated state', async ({ }) => 
 {
     // Delete file with stored authentication state
-    fs.rm(authSettings.authFilepath, { recursive: false }, (err) =>
+    fs.unlink(authSettings.authFilepath, (err) =>
     {
-        if (err) // Could not delete file
-        {
-            console.error("Teardown error - Please see error:\n" + err.message);
-            return;
-        }
+        if (err) console.error("Teardown error - Please see error:\n" + err.message);
     });
 });

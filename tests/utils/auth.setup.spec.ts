@@ -1,26 +1,25 @@
 import { testSetup, expect } from '../../utils/test-setup';
 import { authSettings } from '../../test-data/AuthSettings';
-import { POManager } from '../../page-objects/POManager';
+import { POManagerFactory } from '../../page-objects/POManager';
 
 testSetup('Login and store authenticated state', async ({ page, setupInfo }) => {
 
     // Confirm authentication details are present as environment varaibles
-    if (!setupInfo.username || !setupInfo.password)
+    if (!setupInfo.username || !setupInfo.password || !setupInfo.appName)
     {
         throw new Error('Missing required environment variables for setup');
     }
     
     // Create required pages
-    const poManager = new POManager(page);
-    const blueskyLoginPage = poManager.getBlueskyLoginPage();
-    const blueskyAppPage = poManager.getBlueskyAppPage();
+    const poManager = POManagerFactory(page, setupInfo.appName);
+    const loginPage = poManager.getLoginPage();
+    const homePage = poManager.getHomePage();
     
     // Sign in
-    await blueskyLoginPage.goTo();
-    await blueskyLoginPage.signIn(setupInfo.username, setupInfo.password);
+    await loginPage.signIn(setupInfo.username, setupInfo.password);
 
     // Confirm page has loaded
-    await expect(blueskyAppPage.homeButton).toBeVisible();
+    await expect(homePage.homeButton).toBeVisible();
 
     //Save storage state
     await page.context().storageState({ path: authSettings.authFilepath });

@@ -1,6 +1,7 @@
 import { type Page, type Locator } from '@playwright/test';
+import { ProfilePageInterface } from '../../../page-objects/ProfilePage';
 
-export class BlueskyProfilePage
+export class ProfilePage implements ProfilePageInterface
 {
     page : Page;
     userHandle : string;
@@ -51,10 +52,11 @@ export class BlueskyProfilePage
     {
         await this.#posts.last().waitFor();
         const numPosts = await this.#posts.count();
+        let foundPosts : Locator[] = [];
         for (let i = 1; i < numPosts; i++)
         {
             const currPost = await this.#posts.nth(i);
-            const postDate = await this.getPostTimestamp(currPost);
+            const postDate = await this.getTimestamp(currPost);
 
             if (!postDate) { throw new Error("Date posted is null.") };
             if (postDate.getTime() < date.getTime()) // if postDate is older than our given date
@@ -62,23 +64,26 @@ export class BlueskyProfilePage
                 break;
             }
             
-            await this.getPost(currPost);
+            foundPosts.push(currPost);
+            await this.printPost(currPost);
         }
+
+        return foundPosts;
     }
 
     // Given a post
-    // Return the content of the post
-    async getPost(post : Locator)
+    // Print the content of the post
+    async printPost(post : Locator)
     {
         console.log("Post for : " + this.userHandle + "\n");
 
         // Grab the time of the post
-        const timePosted = await this.getPostTimestamp(post);
+        const timePosted = await this.getTimestamp(post);
         if (!timePosted) { throw new Error("Time posted is null.") };
         console.log("Time posted : " + timePosted.toDateString() + "\n");
         
         // Grab any text in the post, if possible
-        const postText = await this.getPostText(post);
+        const postText = await this.getText(post);
         if (!postText)
         {
             console.log("Post Text : This post has no post text\n");
@@ -89,7 +94,7 @@ export class BlueskyProfilePage
         }
 
         // If the post has images, grab its alt text, if possible
-        const altText = await this.getPostImageAltText(post);
+        const altText = await this.getImageAltText(post);
         if (!altText)
         {
             console.log("Alt Text : This post has no image alt text\n");
@@ -105,7 +110,7 @@ export class BlueskyProfilePage
     // Grab the pinned post
     async getPinnedPost()
     {
-        await this.getPost(this.#posts.nth(0));
+        await this.printPost(this.#posts.nth(0));
     }
 
     // Grab the posts from the last seven days for this user
@@ -119,7 +124,7 @@ export class BlueskyProfilePage
 
     // Given a post,
     // Returns a Javascript Date object for the time it was posted
-    async getPostTimestamp(post : Locator)
+    async getTimestamp(post : Locator)
     {
         await post.waitFor();
         let timePosted = await post.locator("a[aria-label*='AM']").first();
@@ -129,28 +134,35 @@ export class BlueskyProfilePage
         }
         
         const timestamp : string = (await timePosted.getAttribute("aria-label")) || '';
-        return await this.#getDate(timestamp);
+        const date = await this.#getDate(timestamp);
+        if (!date) { throw new Error("Date could not be processed.") };
+        return date;
     }
  
     // Given a post
     // Returns a string of its post text
-    async getPostText(post : Locator)
+    async getText(post : Locator)
     {
         await post.waitFor();
-        const postText = await post.locator("div[data-testid='postText']");
-        if (await postText.count() === 0)
+        const postTextLocator = await post.locator("div[data-testid='postText']");
+        if (await postTextLocator.count() === 0)
         {
             return '';
         }
         else
         {
-            return await postText.textContent();
+            const text = await postTextLocator.textContent();
+            if(!text)
+            {
+                throw new Error("Post text is null.");
+            }
+            return text;
         }
     }
 
     // Given a post
     // Returns a string of the alt text for any images in the post
-    async getPostImageAltText(post : Locator)
+    async getImageAltText(post : Locator)
     {
         const images = await post.locator("div[data-expoimage='true']").locator("img");
         let altText = '';
@@ -173,6 +185,7 @@ export class BlueskyProfilePage
     {
         const flatlist = this.page.locator("div[data-testid='postsFeed-flatlist']").first();
         const postFeed = flatlist.locator("div[data-testid*='feedItem-by']");
+        postFeed.last().waitFor();
         return postFeed;
     }
     
@@ -186,5 +199,3 @@ export class BlueskyProfilePage
         return new Date(parsedDate);
     }
 }
-
-module.exports = {BlueskyProfilePage};

@@ -1,6 +1,7 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { LoginPageInterface } from '../../../page-objects/LoginPage';
 
-export class BlueskyLoginPage
+export class LoginPage implements LoginPageInterface
 {
     page : Page;
     loginPage : string;
@@ -38,12 +39,13 @@ export class BlueskyLoginPage
     // Go to the login page
     async goTo()
     {
-        await this.page.goto(this.loginPage);
+        await this.page.goto(this.loginPage, { waitUntil: 'domcontentloaded' });
     }
 
-    // Given a user's username (or email) and password, sign in
+    // Given a user's username or email and password, sign in
     async signIn(user_usernameOrEmail : string, user_password : string)
     {
+        await this.goTo();
         await this.signInButton.click()
         await this.usernameOrEmail.click()
         await this.usernameOrEmail.fill(user_usernameOrEmail);
@@ -51,5 +53,3 @@ export class BlueskyLoginPage
         await this.nextButton.click();
     }
 }
-
-module.exports = {BlueskyLoginPage};

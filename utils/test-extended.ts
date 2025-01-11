@@ -3,7 +3,10 @@ import { test as baseTest } from '@playwright/test';
 // Load environment variables from .env file
 require('dotenv').config();
 
-interface TestData {
+// Define test data structure
+interface TestData 
+{
+    appName : string | undefined;
     userHandle : string | undefined;
 }
 
@@ -11,7 +14,8 @@ interface TestData {
 export const testExtended = baseTest.extend<{testData : TestData}>({
     testData : 
     {
-        userHandle : process.env.BLUESKY_HANDLE,
+        appName : process.env.APP_NAME,
+        userHandle : process.env.APP_USER_HANDLE,
     }
 });
 export { expect } from '@playwright/test';
