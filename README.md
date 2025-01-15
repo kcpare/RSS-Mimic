@@ -1,5 +1,6 @@
 # RSS-Mimic
 
+### Usage
 Mimic for RSS feed that goes to your email and is filterable. 
 
 Enables email notifications for posts with keywords from people you follow on social media. Ex. When a freelance artist that you follow opens their commissions, receive an email if the post contained the word 'commission'.
