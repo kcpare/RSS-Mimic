@@ -6,5 +6,6 @@ const authFile : string = path.join(__dirname, '../playwright/.auth/user.json');
 // Export authentication settings
 // (except those that must be secure, which get saved in .env as environment variables instead)
 export const authSettings = {
-    authFilepath : authFile // File to store authentication state
+    authFilepath : authFile, // File to store authentication state
+    app : ['bsky'] // If empty, will run every app available
 }

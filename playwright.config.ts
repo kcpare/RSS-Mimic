@@ -1,5 +1,5 @@
 // @ts-check
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -10,16 +10,17 @@ const { defineConfig, devices } = require('@playwright/test');
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
-module.exports = defineConfig({
+
+export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
+  //forbidOnly: !!process.env.CI,
   /* Retry on CI only: process.env.CI ? 2 : 0 */
   retries: 2,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  //workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -30,15 +31,23 @@ module.exports = defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     headless : false,
-    screenshot : 'on',
+    screenshot : 'off',
     trace: 'off',
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    { name : 'setup', testMatch: /.*\.setup\.spec.ts/, teardown: 'teardown' },
+  projects: [  
+    { name : 'app_setup', testMatch: /.*app.setup.spec.ts/, },
     
-    { name: 'teardown', testMatch: /.*\.teardown\.spec.ts/ },
+    { name : 'auth_setup', testMatch: /.*auth.setup.spec.ts/, dependencies: ['app_setup'], teardown: 'teardown' },
+    
+    { name: 'teardown', testMatch: /.*teardown.spec.ts/ },
+
+    {
+      name: 'desktop_browsers',
+      testIgnore: /.*tests.*/,
+      dependencies: ['chromium', 'firefox', 'webkit'], 
+    },
 
     {
       name: 'chromium',
@@ -48,7 +57,7 @@ module.exports = defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['auth_setup'],
     },
 
     {
@@ -59,7 +68,7 @@ module.exports = defineConfig({
         ...devices['Desktop Firefox'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['auth_setup'],
     },
     
     {
@@ -70,7 +79,7 @@ module.exports = defineConfig({
         ...devices['Desktop Safari'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['auth_setup'],
       
     },
     

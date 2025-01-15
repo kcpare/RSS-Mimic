@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "setup" : "npx playwright test --project=setup",
-    "setup-no-deps" : "npx playwright test --project=setup --no-deps",
-    "teardown" : "npx playwright test --project=teardown",
-    "firefox" : "npx playwright test --project=firefox",
-    "firefox-no-deps" : "npx playwright test --project=firefox --no-deps",
-    "chrome" : "npx playwright test --project=chromium",
-    "chrome-no-deps" : "npx playwright test --project=chromium --no-deps",
-    "safari" : "npx playwright test --project=webkit",
-    "safari-no-deps" : "npx playwright test --project=webkit --no-deps"
+    "test": "npx playwright test --project=desktop_browsers --workers 1",
+    "setup": "npx playwright test --project=setup",
+    "setup-no-deps": "npx playwright test --project=setup --no-deps",
+    "teardown": "npx playwright test --project=teardown",
+    "firefox": "npx playwright test --project=firefox",
+    "firefox-no-deps": "npx playwright test --project=firefox --no-deps",
+    "chrome": "npx playwright test --project=chromium",
+    "chrome-no-deps": "npx playwright test --project=chromium --no-deps",
+    "safari": "npx playwright test --project=webkit",
+    "safari-no-deps": "npx playwright test --project=webkit --no-deps"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "@types/node": "^22.10.4"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.33.0",
     "dotenv": "^16.4.7"
   }
 }

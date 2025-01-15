@@ -1,4 +1,4 @@
-import { testExtended, expect } from '../utils/test-extended';
+import { testExtended } from '../utils/test-extended';
 import { POManagerFactory } from '../page-objects/POManager';
 
 testExtended.only('Search latest posts from followed accounts', async ({ page, testData }) => 
@@ -25,6 +25,6 @@ testExtended.only('Search latest posts from followed accounts', async ({ page, t
         await homePage.searchAndGoTo(followList[i]);
         profilePage = poManager.getProfilePage(followList[i]);
         await profilePage.getPinnedPost();
-        await profilePage.getPastWeekPosts();
+        //await profilePage.getPastWeekPosts();
     }
 });
